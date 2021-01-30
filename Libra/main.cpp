@@ -4,6 +4,8 @@
 #include<ios> //used to get stream size
 #include<limits> //used to get numeric limits
 
+#include"db.h"
+
 using namespace std;
 
 int bookOptions() {
@@ -216,10 +218,11 @@ void home () {
 
 
 int main () {
+	CreateTable ();
 	cout << "*** WELCOME ***";
 	string yn;
 	while(true) {
-		cout << endl << "--- Library Management System ---" << endl;
+		cout << endl << "--- Postgres Library Management System ---" << endl;
 		home();
 		cout << endl << "continue? (y/n) :";
 		cin >> yn;
