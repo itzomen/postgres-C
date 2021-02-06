@@ -5,7 +5,6 @@ using namespace std;
 using namespace pqxx;
 
 int main(int argc, char* argv[]) {
-   char * sql;
    
    try {
       connection C("dbname = mydatabase user = eufresia password = password hostaddr = 127.0.0.1 port = 5432");

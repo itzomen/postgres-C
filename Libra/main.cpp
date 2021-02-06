@@ -26,29 +26,26 @@ int bookOptions() {
 
 
 void addBook() {
-	string bookTitle, bookAuthor, bookDetail, line;
-	int count = 0;
+	string bookTitle, bookAuthor, bookDetail, count;
+	cout << "Enter Book ID: ";
+	cin >> count;
 
 	cout << endl << "--- Provide Book Details ---" << endl;
 	cout << "Title: ";
-	getline(cin, bookTitle);
+	cin >> bookTitle;
+	cin.ignore ( std::numeric_limits<std::streamsize>::max(), '\n' ); 
 	cout << "Author: ";
-	getline(cin, bookAuthor);
-
-	// reading file for number of books
-	ifstream countData("library.dat");
-	while (getline(countData, line)) {
-		count++;
-	}
-
-	countData.close();
+	cin >> bookAuthor;
+	cin.ignore ( std::numeric_limits<std::streamsize>::max(), '\n' ); 
 
 	// open file for writing
 	ofstream writeToLibrary;
 
     writeToLibrary.open("library.dat", ios::app);
 
-	bookDetail = to_string(count) + ", " + bookTitle + ", " + bookAuthor;
+	bookDetail = count + ", " + bookTitle + ", " + bookAuthor;
+	// Save to Database
+	SaveToDb(count, bookTitle, bookAuthor);
 
 	// write
 	writeToLibrary << bookDetail << endl;
@@ -63,58 +60,20 @@ void addBook() {
 void UpdateBook() {
 	cout << endl << "--- Update Book ---" << endl;
 	string id;
+	string title, author;
 	cout << "Enter Book ID: ";
 	cin >> id;
 	cin.ignore ( std::numeric_limits<std::streamsize>::max(), '\n' ); 
 
 	bool bookExist = false;
-	ifstream data("library.dat");
-	ofstream temp;
-	temp.open("temp.dat", ios::app); //Temporary file
+	cout << endl << "--- Provide Book Details ---" << endl;
+	cout << "New Title: ";
+	getline(cin, title);
+	cout << "New  Author: ";
+	getline(cin, author);
+	updateDb(to_string(id), title, author);
 
-	if(!data || !temp)
-    {
-        cout << "Error opening files!" << endl;
-        return;
-    }
-
-	string strTemp;
-    while(getline(data, strTemp))
-    {   
-		size_t found = strTemp.find(id); 
-		if (found != string::npos) {
-			string title, author;
-
-			cout << "Book: " << strTemp << endl; 
-
-			cout << "New Book Title: ";
-			getline(cin, title);
-			cout << "New Book Author: ";
-			getline(cin, author);
-
-			strTemp = id + ", " + title + ", " + author;
-			bookExist = true;
-		}
-		temp << strTemp << endl;
-	}
-
-	data.close();
-	temp.close();
-
-	if(bookExist) {
-		// delete old file
-		if( remove( "library.dat" ) != 0 )
-			perror( "Error deleting file" );
-
-		// rename new file to old file
-		if ( rename("temp.dat", "library.dat")) {
-			perror("Error renaming");
-			return;
-		}
-
-		cout << "Book Details Updated" << endl; 
-
-	} else cout << "No book found with ID " << id << endl;
+	cout << "Book Details Updated" << endl; 
 }
 
 
@@ -124,65 +83,15 @@ void DeleteBook() {
 	cout << "Enter Book ID: ";
 	cin >> id;
 	cin.ignore ( std::numeric_limits<std::streamsize>::max(), '\n' ); 
-
-	bool bookExist = false;
-	ifstream data("library.dat");
-	ofstream temp;
-	temp.open("temp.dat", ios::app); //Temporary file
-
-	if(!data || !temp)
-    {
-        cout << "Error opening files!" << endl;
-        return;
-    }
-
-	string strTemp;
-	bool delBook = false;
-    while(getline(data, strTemp))
-    {   
-		size_t found = strTemp.find(id); 
-		if (found != string::npos) {
-			cout << "Book: " << strTemp << endl; 
-			bookExist = true;
-			delBook = true;
-		}
-		if(delBook) {
-			delBook = false;
-			continue;
-		}
-		temp << strTemp << endl;
-	}
-
-	data.close();
-	temp.close();
-
-	if(bookExist) {
-
-		// delete old file
-		if( remove( "library.dat" ) != 0 )
-			perror( "Error deleting file" );
-
-		// rename new file to old file
-		if ( rename("temp.dat", "library.dat")) {
-			perror("Error renaming");
-			return;
-		}
-
-		cout << "Book Deleted" << endl; 
-
-	} else cout << "No book found with ID " << id << endl;
+	Delete(to_string(id));
+	
+	cout << "Book Deleted" << endl; 
 }
 
 
 void showBooks() {
 	cout << "--- List of books ---" << endl;
-
-	ifstream data("library.dat");
-    string row;
-    while(getline(data, row))
-    {   
-        cout << row << endl;
-    }
+	showBook();
 }
 
 
